@@ -78,9 +78,7 @@ import {
   getCurrentInstance,
   provide,
   ref,
-  onMounted,
   toRef,
-  watch,
   unref,
 } from 'vue'
 import ElButton from '@element-plus/components/button'
@@ -164,7 +162,6 @@ export default defineComponent({
   emits: ['visible-change', 'click', 'command'],
   setup(props, { emit }) {
     const _instance = getCurrentInstance()
-    // const { ELEMENT } = useDropdown()
 
     const triggeringElementRef = ref()
     const referenceElementRef = ref()
@@ -179,24 +176,8 @@ export default defineComponent({
       maxHeight: addUnit(props.maxHeight),
     }))
 
-    const triggerVnode = ref<Nullable<ComponentPublicInstance>>(null)
-    const triggerElm = computed<Nullable<HTMLButtonElement>>(() => {
-      const _: any = (triggerVnode.value?.$refs.triggerRef as HTMLElement)
-        ?.children[0]
-      return !props.splitButton ? _ : _?.children?.[1]
-    })
-
     function handleClick() {
-      if (triggerElm.value?.disabled) return
       popperRef.value?.onClose()
-    }
-
-    function triggerElmFocus() {
-      triggerElm.value?.focus?.()
-    }
-
-    function triggerElmBlur() {
-      triggerElm.value?.blur?.()
     }
 
     const dropdownSize = useSize()
@@ -205,12 +186,11 @@ export default defineComponent({
       emit('command', ...args)
     }
 
-    function onItemEnter(e: PointerEvent) {
-      // console.log(e)
+    function onItemEnter() {
       // NOOP for now
     }
 
-    function onItemLeave(e: PointerEvent) {
+    function onItemLeave() {
       const contentEl = unref(contentRef)
 
       contentEl?.focus()
@@ -243,7 +223,6 @@ export default defineComponent({
       commandHandler,
       trigger: toRef(props, 'trigger'),
       hideOnClick: toRef(props, 'hideOnClick'),
-      triggerElm,
     })
 
     const onMountOnFocus = (e: Event) => {
@@ -253,7 +232,7 @@ export default defineComponent({
       })
     }
 
-    const handlerMainButtonClick = (event) => {
+    const handlerMainButtonClick = (event: PointerEvent) => {
       emit('click', event)
     }
 
